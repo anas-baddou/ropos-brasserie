@@ -121,7 +121,7 @@ namespace webAPIBrasserie.Controllers
         }
         //Lister l’ensemble des bières par brasserie et les grossistes qui la vendent
         [HttpGet("GetBiereParBrasserie/{brasserieId}")]
-        public IActionResult GetBeersByBrewery(int brasserieId)
+        public IActionResult GetBieresByBrasseurs(int brasserieId)
         {
             var brasserie = _context.Brasseurs
                 .Include(b => b.Bieres)

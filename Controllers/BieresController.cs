@@ -152,7 +152,7 @@ namespace webAPIBrasserie.Controllers
         }
         //Supprimer une bière d’un brasseur
         [HttpDelete("DeleteBiere/{brasserieId}/{biereId}")]
-        public async Task<IActionResult> DeleteBeer(int brasserieId, int biereId)
+        public async Task<IActionResult> DeleteBiere(int brasserieId, int biereId)
         {
             var brasserie = await _context.Brasseurs.FindAsync(brasserieId);
 
@@ -168,7 +168,7 @@ namespace webAPIBrasserie.Controllers
                 return NotFound("Bière non trouvée");
             }
 
-            // Assurez-vous que la bière appartient à la brasserie
+            // tester que la bière appartient à la brasserie
             if (biere.BrasseurId!= brasserieId)
             {
                 return BadRequest("La bière ne fait pas partie de cette brasserie");

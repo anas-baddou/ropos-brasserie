@@ -163,10 +163,10 @@ namespace webAPIBrasserie.Controllers
         {
             try
             {
-                // Obtenez la bière
+                // Obtenir la bière
                 var biere = _context.Bieres.FirstOrDefault(b => b.Id == venteModel.BiereId);
 
-                // Obtenez le grossiste
+                // Obtenir le grossiste
                 var grossiste = _context.Grossistes.FirstOrDefault(g => g.Id == venteModel.GrossisteId);
 
                 if (biere == null || grossiste == null)
@@ -174,7 +174,7 @@ namespace webAPIBrasserie.Controllers
                     return NotFound("Bière ou grossiste non trouvé");
                 }
 
-                // Vérifiez si la bière est vendue par le grossiste
+                // Vérifier si la bière est vendue par le grossiste
                 var isBiereVendueParGrossiste = _context.Ventes
                     .Any(v => v.BiereId == venteModel.BiereId && v.GrossisteId == venteModel.GrossisteId);
 
@@ -183,19 +183,19 @@ namespace webAPIBrasserie.Controllers
                     return BadRequest("La bière n'est pas vendue par le grossiste");
                 }
 
-                // Vérifiez si la quantité vendue est valide
+                // Vérifier si la quantité vendue est valide
                 if (venteModel.Qtevendue <= 0)
                 {
                     return BadRequest("La quantité vendue doit être supérieure à zéro");
                 }
 
-                // Vérifiez si la quantité vendue ne dépasse pas le stock du grossiste
+                // Vérifiee si la quantité vendue ne dépasse pas le stock du grossiste
                 if (venteModel.Qtevendue > grossiste.Stock)
                 {
                     return BadRequest("La quantité vendue dépasse le stock du grossiste");
                 }
 
-                // Créez une nouvelle vente
+                // Créer une nouvelle vente
                 var nouvelleVente = new Vente
                 {
                     BiereId = venteModel.BiereId,
@@ -204,13 +204,13 @@ namespace webAPIBrasserie.Controllers
                     Date = DateTime.UtcNow
                 };
 
-                // Ajoutez la vente à la base de données
+                // Ajouter la vente à la base de données
                 _context.Ventes.Add(nouvelleVente);
 
-                // Mettez à jour le stock du grossiste
+                // Mettre à jour le stock du grossiste
                 grossiste.Stock -= venteModel.Qtevendue;
 
-                // Sauvegardez les modifications dans la base de données
+                // save les modifications dans la base de données
                 _context.SaveChanges();
 
                 return Ok("Vente ajoutée avec succès");
@@ -228,10 +228,10 @@ namespace webAPIBrasserie.Controllers
             {
                 Console.WriteLine($"Biere ID: {model.BiereId}, Grossiste ID: {model.GrossisteId}, Nouvelle Quantite: {model.NouvelleQuantite}");
 
-                // Obtenez le grossiste
+                // Obtenir le grossiste
                 var grossiste = _context.Grossistes.FirstOrDefault(g => g.Id == model.GrossisteId);
 
-                // Obtenez la bière
+                // Obtenir la bière
                 var biere = _context.Bieres.FirstOrDefault(b => b.Id == model.BiereId);
 
                 if (grossiste == null || biere == null)
@@ -239,16 +239,16 @@ namespace webAPIBrasserie.Controllers
                     return NotFound("Grossiste ou bière non trouvé");
                 }
 
-                // Assurez-vous que la quantité mise à jour est valide
+                // tester que la quantité mise à jour est valide
                 if (model.NouvelleQuantite < 0)
                 {
                     return BadRequest("La nouvelle quantité doit être positive");
                 }
 
-                // Mettez à jour la quantité restante de la bière chez le grossiste
+                // update la quantité restante de la bière chez le grossiste
                 biere.Quantite = model.NouvelleQuantite;
 
-                // Sauvegardez les modifications dans la base de données
+                // save les modifications dans la base de données
                 _context.SaveChanges();
 
                 return Ok("Quantité mise à jour avec succès");
