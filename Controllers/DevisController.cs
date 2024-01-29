@@ -22,20 +22,16 @@ namespace webAPIBrasserie.Controllers
         public class DemandeDevisModel
         {
             public int GrossisteId { get; set; }
-            public List<BiereDemandeModel> Bieres { get; set; }
+            public List<Biere> Bieres { get; set; }
         }
 
-        public class BiereDemandeModel
-        {
-            public int Id { get; set; }
-            public string Nom { get; set; }
-            public int Quantite { get; set; }
-            public decimal Prix { get; set; }
-        }
+      
 
         [HttpPost("DemanderDevis")]
         public IActionResult DemanderDevis([FromBody] DemandeDevisModel demandeDevis)
         {
+            
+
             try
             {
                 // Valider que la demande n'est pas vide
@@ -43,6 +39,7 @@ namespace webAPIBrasserie.Controllers
                     throw new Exception("La demande ne peut pas être vide");
 
                 var grossiste = _context.Grossistes.FirstOrDefault(g => g.Id == demandeDevis.GrossisteId);
+                
 
                 if (grossiste == null)
                     throw new Exception("Le grossiste n'existe pas");
@@ -55,7 +52,7 @@ namespace webAPIBrasserie.Controllers
 
                 // Créer un récapitulatif ou toute information supplémentaire
                 var recapitulatif = $"Demande réussie chez le grossiste {grossiste.Nom}. " +
-                                    $"Prix total après réduction : {prixTotal:E}";
+                                    $"Prix total après réduction : {prixTotal:C}";
 
                 return Ok(new { PrixTotal = prixTotal, Recapitulatif = recapitulatif });
             }
@@ -65,7 +62,7 @@ namespace webAPIBrasserie.Controllers
             }
         }
 
-        private void ValidateBieres(List<BiereDemandeModel> bieres)
+        private void ValidateBieres(List<Biere> bieres)
         {
             // Valider chaque bière
             foreach (var biereDemande in bieres)
@@ -83,23 +80,35 @@ namespace webAPIBrasserie.Controllers
                 throw new Exception("Il ne peut pas y avoir de doublon dans la demande");
         }
         //methode pour calculer le prix total
-        private decimal CalculateTotalPrice(List<BiereDemandeModel> bieres)
+        private decimal CalculateTotalPrice(List<Biere> bieres)
         {
             decimal prixTotal = 0;
 
             // Appliquer une réduction si le nombre total de bières est supérieur à 20
             if (bieres.Sum(b => b.Quantite) > 20)
             {
-                prixTotal = bieres.Sum(b => b.Prix) * bieres.Sum(b => b.Quantite) * 0.8m; // 20% de réduction
+                decimal prixSum = bieres.Sum(b => (decimal)b.Prix);
+                decimal quantiteSum = bieres.Sum(b => (decimal)b.Quantite);
+
+                prixTotal = prixSum * quantiteSum * 0.8m; // 20% de réduction
+                Console.WriteLine($"Biere ID: {prixTotal}, Grossiste ID: {prixSum}, Nouvelle Quantite: {quantiteSum}");
             }
             // Appliquer une réduction si le nombre total de bières est supérieur à 10
             else if (bieres.Sum(b => b.Quantite) > 10)
             {
-                prixTotal = bieres.Sum(b => b.Prix) * bieres.Sum(b => b.Quantite) * 0.9m; // 10% de réduction
+                decimal prixSum = bieres.Sum(b => (decimal)b.Prix);
+                decimal quantiteSum = bieres.Sum(b => (decimal)b.Quantite);
+
+                prixTotal = prixSum * quantiteSum * 0.9m; // 10% de réduction
+                Console.WriteLine($"Biere ID: {prixTotal}, Grossiste ID: {prixSum}, Nouvelle Quantite: {quantiteSum}");
             }
             else
             {
-                prixTotal = bieres.Sum(b => b.Prix) * bieres.Sum(b => b.Quantite);
+                decimal prixSum = bieres.Sum(b => (decimal)b.Prix);
+                decimal quantiteSum = bieres.Sum(b => (decimal)b.Quantite);
+
+                prixTotal = prixSum * quantiteSum;
+                Console.WriteLine($"prixtotal: {prixTotal}, totalbiere: {prixSum}, Quantite: {quantiteSum}");
             }
 
             return prixTotal;
